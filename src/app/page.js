@@ -1,66 +1,206 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import { Sparkles, Send, RefreshCw, CheckCircle, AlertCircle, Image as ImageIcon } from 'lucide-react';
 
 export default function Home() {
+  const [gameState, setGameState] = useState('IDLE'); // IDLE, LOADING, PLAYING, SCORING, RESULT
+  const [targetLanguage, setTargetLanguage] = useState('English');
+  const [imageData, setImageData] = useState(null);
+  const [userDescription, setUserDescription] = useState('');
+  const [scoreResult, setScoreResult] = useState(null);
+  const [error, setError] = useState(null);
+
+  const inputRef = useRef(null);
+
+  const startGame = async () => {
+    setGameState('LOADING');
+    setError(null);
+    setUserDescription('');
+    setScoreResult(null);
+    setImageData(null);
+
+    try {
+      const res = await fetch('/api/random-image');
+      if (!res.ok) throw new Error('Failed to fetch image');
+      const data = await res.json();
+      setImageData(data);
+      setGameState('PLAYING');
+    } catch (err) {
+      console.error(err);
+      setError('Failed to load image. Please try again.');
+      setGameState('IDLE');
+    }
+  };
+
+  const submitDescription = async () => {
+    if (!userDescription.trim()) return;
+
+    setGameState('SCORING');
+    try {
+      const res = await fetch('/api/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userDescription,
+          originalDescription: imageData.description,
+          targetLanguage
+        })
+      });
+
+      if (!res.ok) throw new Error('Failed to score result');
+      const result = await res.json();
+      setScoreResult(result);
+      setGameState('RESULT');
+    } catch (err) {
+      console.error(err);
+      setError('Failed to score. Please try again.');
+      setGameState('PLAYING');
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      submitDescription();
+    }
+  };
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="container">
+      <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+          <Sparkles className="text-primary" />
+          Irasutoya Challenge
+        </h1>
+        <p style={{ opacity: 0.8 }}>Describe the random image in your target language!</p>
+      </header>
+
+      {/* ERROR MESSAGE */}
+      {error && (
+        <div className="card" style={{ background: '#fee2e2', borderColor: '#ef4444', color: '#b91c1c', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <AlertCircle size={20} />
+            {error}
+          </div>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      )}
+
+      {/* IDLE STATE */}
+      {gameState === 'IDLE' && (
+        <div className="card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+          <div style={{ marginBottom: '2rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>I am learning:</label>
+            <input
+              type="text"
+              value={targetLanguage}
+              onChange={(e) => setTargetLanguage(e.target.value)}
+              className="input-field"
+              style={{ maxWidth: '200px', textAlign: 'center', height: 'auto', minHeight: 'unset', padding: '0.5rem' }}
             />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
+          <button onClick={startGame} className="btn-primary">
+            Start Game
+          </button>
         </div>
-      </main>
-    </div>
+      )}
+
+      {/* LOADING STATE */}
+      {gameState === 'LOADING' && (
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
+          <div className="spinner" style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent', width: '50px', height: '50px', borderWidth: '5px' }}></div>
+          <p style={{ marginTop: '1rem', fontWeight: 600 }}>Fetching a random image...</p>
+        </div>
+      )}
+
+      {/* PLAYING STATE */}
+      {(gameState === 'PLAYING' || gameState === 'SCORING' || gameState === 'RESULT') && imageData && (
+        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+          <div className="card" style={{ padding: '1rem', marginBottom: '2rem', display: 'flex', justifyContent: 'center', background: 'white' }}>
+            <img
+              src={imageData.imageUrl}
+              alt="Random Irasutoya"
+              style={{ maxWidth: '100%', maxHeight: '400px', height: 'auto', borderRadius: '8px' }}
+            />
+          </div>
+
+          <div className="card">
+            {gameState !== 'RESULT' ? (
+              <>
+                <h3 style={{ marginBottom: '1rem' }}>Describe this image in {targetLanguage}:</h3>
+                <textarea
+                  ref={inputRef}
+                  value={userDescription}
+                  onChange={(e) => setUserDescription(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="input-field"
+                  placeholder={`Type your description in ${targetLanguage}...`}
+                  autoFocus
+                  disabled={gameState === 'SCORING'}
+                />
+                <button
+                  onClick={submitDescription}
+                  className="btn-primary"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                  disabled={gameState === 'SCORING' || !userDescription.trim()}
+                >
+                  {gameState === 'SCORING' ? (
+                    <div className="spinner" style={{ width: '20px', height: '20px' }}></div>
+                  ) : (
+                    <>
+                      Submit Answer <Send size={18} />
+                    </>
+                  )}
+                </button>
+              </>
+            ) : (
+              /* RESULT STATE */
+              <div style={{ animation: 'fadeIn 0.5s ease' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
+                  <h2 style={{ fontSize: '1.5rem' }}>Result</h2>
+                  <div style={{
+                    fontSize: '2rem',
+                    fontWeight: 800,
+                    color: scoreResult?.score > 80 ? '#22c55e' : scoreResult?.score > 50 ? '#eab308' : '#ef4444'
+                  }}>
+                    {scoreResult?.score}/100
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <h4 style={{ color: 'var(--primary)', marginBottom: '0.5rem', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px' }}>AI Feedback</h4>
+                  <p>{scoreResult?.feedback}</p>
+                </div>
+
+                {scoreResult?.correction && (
+                  <div style={{ marginBottom: '1.5rem', background: 'var(--surface-secondary)', padding: '1rem', borderRadius: '8px' }}>
+                    <h4 style={{ color: 'var(--foreground)', marginBottom: '0.5rem', fontSize: '0.8rem' }}>Better way to say it:</h4>
+                    <p style={{ fontStyle: 'italic' }}>"{scoreResult.correction}"</p>
+                  </div>
+                )}
+
+                <div style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+                  <h4 style={{ marginBottom: '0.5rem', fontSize: '0.9rem', opacity: 0.7 }}>Original Japanese Description</h4>
+                  <p style={{ background: '#eee', padding: '0.5rem', borderRadius: '4px', display: 'inline-block' }}>{imageData.description}</p>
+                  <div style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}>
+                    <a href={imageData.originalUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>
+                      View Original Post
+                    </a>
+                  </div>
+                </div>
+
+                <button
+                  onClick={startGame}
+                  className="btn-primary"
+                  style={{ width: '100%', marginTop: '2rem', justifyContent: 'center' }}
+                >
+                  Next Image <RefreshCw size={18} />
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </main>
   );
 }
