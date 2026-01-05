@@ -32,7 +32,7 @@ export async function POST(request) {
 
         // REAL RESPONSE using Gemini API
         const prompt = `
-      You are a strict language tutor. 
+      You are a language tutor. 
       The user is learning: ${targetLanguage || 'English'}
       The user's native language is: ${nativeLanguage || 'Japanese'}
       
