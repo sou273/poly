@@ -73,7 +73,7 @@ export default function Home() {
       <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
         <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
           <Sparkles className="text-primary" />
-          Irasutoya Challenge
+          Picture Description
         </h1>
         <p style={{ opacity: 0.8 }}>Describe the random image in your target language!</p>
       </header>
