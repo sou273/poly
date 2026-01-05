@@ -40,10 +40,15 @@ export async function POST(request) {
       User's Description: "${userDescription}"
       
       Task:
-      1. Rate the user's description on a scale of 0-100 based on accuracy of meaning and grammar in ${targetLanguage}.
+      1. Rate the user's description on a scale of 0-100 based on accuracy of meaning and grammar in ${targetLanguage}. 
       2. Provide brief, constructive feedback in ${nativeLanguage}.
       3. Provide 3 native-like, natural alternative ways to express the description in ${targetLanguage}.
          - Ranging from simple to more advanced/natural phrasing.
+
+      Evaluation Guidelines:
+　　　　- This is a learning exercise, so technical terminology is not required.
+　　　　- A good description should be grammatically correct, use appropriate vocabulary, and allow someone to visualize the illustration based on the explanation.
+　　　　- Even if the user's answer contains errors, provide encouraging feedback with a touch of playful humor.
 
       Return JSON format:
       {
