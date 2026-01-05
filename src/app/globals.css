@@ -98,8 +98,10 @@ body {
   border-radius: 8px;
   border: 1px solid #dcd7cd;
   /* Soft beige border */
-  background-color: rgba(255, 255, 255, 0.5);
-  color: inherit;
+  background-color: #ffffff;
+  /* Solid white background */
+  color: #333333;
+  /* Dark text for contrast */
   margin-bottom: 1rem;
   font-size: 1rem;
   transition: all 0.2s;
@@ -124,4 +126,34 @@ body {
   to {
     transform: rotate(360deg);
   }
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
 }

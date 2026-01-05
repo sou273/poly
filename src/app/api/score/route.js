@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request) {
     try {
-        const { userDescription, originalDescription, targetLanguage } = await request.json();
+        const { userDescription, originalDescription, targetLanguage, nativeLanguage } = await request.json();
 
         if (!userDescription || !originalDescription) {
             return NextResponse.json(
@@ -21,28 +21,35 @@ export async function POST(request) {
             return NextResponse.json({
                 score: mockScore,
                 feedback: "This is a mock feedback because no API key is configured. Your description seems close!",
-                correction: originalDescription
+                feedback: "This is a mock feedback because no API key is configured. Your description seems close!",
+                corrections: [
+                    originalDescription,
+                    "Another way to say it",
+                    "A third variation"
+                ]
             });
         }
 
         // REAL RESPONSE using Gemini API
         const prompt = `
       You are a strict language tutor. 
-      The user is describing an image in: ${targetLanguage || 'Japanese'}.
+      The user is learning: ${targetLanguage || 'English'}
+      The user's native language is: ${nativeLanguage || 'Japanese'}
       
       Original Description (Correct Meaning): "${originalDescription}"
       User's Description: "${userDescription}"
       
       Task:
-      1. Rate the user's description on a scale of 0-100 based on accuracy of meaning and grammar.
-      2. Provide brief, constructive feedback in English.
-      3. Provide a corrected version of the user's sentence if it has errors.
+      1. Rate the user's description on a scale of 0-100 based on accuracy of meaning and grammar in ${targetLanguage}.
+      2. Provide brief, constructive feedback in ${nativeLanguage}.
+      3. Provide 3 native-like, natural alternative ways to express the description in ${targetLanguage}.
+         - Ranging from simple to more advanced/natural phrasing.
 
       Return JSON format:
       {
         "score": number,
         "feedback": "string",
-        "correction": "string"
+        "corrections": ["string", "string", "string"]
       }
     `;
 

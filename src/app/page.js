@@ -7,6 +7,7 @@ import { Sparkles, Send, RefreshCw, CheckCircle, AlertCircle, Image as ImageIcon
 export default function Home() {
   const [gameState, setGameState] = useState('IDLE'); // IDLE, LOADING, PLAYING, SCORING, RESULT
   const [targetLanguage, setTargetLanguage] = useState('English');
+  const [nativeLanguage, setNativeLanguage] = useState('Japanese');
   const [imageData, setImageData] = useState(null);
   const [userDescription, setUserDescription] = useState('');
   const [scoreResult, setScoreResult] = useState(null);
@@ -45,7 +46,8 @@ export default function Home() {
         body: JSON.stringify({
           userDescription,
           originalDescription: imageData.description,
-          targetLanguage
+          targetLanguage,
+          nativeLanguage
         })
       });
 
@@ -90,14 +92,26 @@ export default function Home() {
       {gameState === 'IDLE' && (
         <div className="card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
           <div style={{ marginBottom: '2rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>I am learning:</label>
-            <input
-              type="text"
-              value={targetLanguage}
-              onChange={(e) => setTargetLanguage(e.target.value)}
-              className="input-field"
-              style={{ maxWidth: '200px', textAlign: 'center', height: 'auto', minHeight: 'unset', padding: '0.5rem' }}
-            />
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>I speak (Native Language):</label>
+              <input
+                type="text"
+                value={nativeLanguage}
+                onChange={(e) => setNativeLanguage(e.target.value)}
+                className="input-field"
+                style={{ maxWidth: '200px', textAlign: 'center', height: 'auto', minHeight: 'unset', padding: '0.5rem' }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>I am learning (Target Language):</label>
+              <input
+                type="text"
+                value={targetLanguage}
+                onChange={(e) => setTargetLanguage(e.target.value)}
+                className="input-field"
+                style={{ maxWidth: '200px', textAlign: 'center', height: 'auto', minHeight: 'unset', padding: '0.5rem' }}
+              />
+            </div>
           </div>
           <button onClick={startGame} className="btn-primary">
             Start Game
@@ -168,14 +182,25 @@ export default function Home() {
                 </div>
 
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <h4 style={{ color: 'var(--primary)', marginBottom: '0.5rem', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px' }}>AI Feedback</h4>
+                  <h4 style={{ color: 'var(--primary)', marginBottom: '0.5rem', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Your Answer</h4>
+                  <p style={{ fontStyle: 'italic', opacity: 0.9 }}>"{userDescription}"</p>
+                </div>
+
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <h4 style={{ color: 'var(--primary)', marginBottom: '0.5rem', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px' }}>AI Feedback ({nativeLanguage})</h4>
                   <p>{scoreResult?.feedback}</p>
                 </div>
 
-                {scoreResult?.correction && (
+                {scoreResult?.corrections && scoreResult.corrections.length > 0 && (
                   <div style={{ marginBottom: '1.5rem', background: 'var(--surface-secondary)', padding: '1rem', borderRadius: '8px' }}>
-                    <h4 style={{ color: 'var(--foreground)', marginBottom: '0.5rem', fontSize: '0.8rem' }}>Better way to say it:</h4>
-                    <p style={{ fontStyle: 'italic' }}>"{scoreResult.correction}"</p>
+                    <h4 style={{ color: 'var(--foreground)', marginBottom: '0.5rem', fontSize: '0.8rem' }}>Better ways to say it:</h4>
+                    <ul style={{ paddingLeft: '1.2rem', margin: 0 }}>
+                      {scoreResult.corrections.map((correction, index) => (
+                        <li key={index} style={{ marginBottom: '0.5rem', fontStyle: 'italic' }}>
+                          "{correction}"
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
 
