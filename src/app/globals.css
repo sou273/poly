@@ -1,118 +1,108 @@
 :root {
   --background: #fdf6e3;
   /* Solarized Light base */
-  --foreground: #657b83;
-  --primary: #2aa198;
-  --primary-hover: #268bd2;
-  --secondary: #b58900;
-  --accent: #d33682;
-  --surface: #ffffff;
-  --surface-secondary: #eee8d5;
-  --border: #93a1a1;
-  --radius: 12px;
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --background: #fdfbf7;
+  /* Off-white / Cream */
+  --foreground: #4a4036;
+  /* Dark Brown */
+  --card-bg: rgba(255, 255, 255, 0.6);
+  --primary: #556b2f;
+  /* Olive Green */
+  --primary-hover: #6b8e23;
+  /* Lighter Olive */
+  --accent: #d2b48c;
+  /* Tan */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #002b36;
-    /* Solarized Dark base */
-    --foreground: #839496;
-    --primary: #2aa198;
-    --secondary: #b58900;
-    --surface: #073642;
-    --surface-secondary: #586e75;
-    --border: #586e75;
+    --background: #2c2a25;
+    /* Dark Earth */
+    --foreground: #e8e6e3;
+    /* Light Cream */
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --primary: #6b8e23;
+    /* Olive Drab */
+    --primary-hover: #8fbc8f;
+    /* Dark Sea Green */
+    --accent: #8b4513;
+    /* Saddle Brown */
   }
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 body {
-  background-color: var(--background);
+  background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-family);
-  line-height: 1.6;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s, color 0.3s;
 }
 
-h1,
-h2,
-h3 {
-  color: var(--primary);
-  line-height: 1.2;
-}
-
-button {
-  cursor: pointer;
-  border: none;
-  font-family: inherit;
-}
-
-.container {
+/* Custom Styles for the Game */
+.game-container {
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
-  width: 100%;
+  text-align: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  color: var(--primary);
+  /* Removed gradient for a more solid, natural look */
 }
 
 .card {
-  background: var(--surface);
-  border-radius: var(--radius);
+  background-color: var(--card-bg);
+  border: 1px solid rgba(139, 69, 19, 0.1);
+  /* Subtle brown border */
+  border-radius: 16px;
+  /* Softer rounded corners */
   padding: 2rem;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
-  transition: transform 0.2s ease;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+  margin-bottom: 2rem;
+  backdrop-filter: blur(8px);
 }
 
-.btn-primary {
-  background: var(--primary);
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius);
-  font-weight: 600;
-  font-size: 1.1rem;
-  transition: all 0.2s;
-  display: inline-flex;
+.image-container {
+  width: 100%;
+  min-height: 300px;
+  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 1rem;
 }
 
-.btn-primary:hover {
-  filter: brightness(1.1);
-}
-
-.btn-primary:active {
-  transform: scale(0.98);
-}
-
-.btn-secondary {
-  background: transparent;
-  border: 2px solid var(--primary);
-  color: var(--primary);
-  padding: 0.65rem 1.4rem;
-  border-radius: var(--radius);
-  font-weight: 600;
+.image-container img {
+  max-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 8px;
 }
 
 .input-field {
   width: 100%;
-  padding: 1rem;
-  border-radius: var(--radius);
-  border: 2px solid var(--border);
-  background: var(--surface);
-  color: var(--foreground);
-  font-size: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #dcd7cd;
+  /* Soft beige border */
+  background-color: rgba(255, 255, 255, 0.5);
+  color: inherit;
   margin-bottom: 1rem;
-  resize: vertical;
-  min-height: 100px;
+  font-size: 1rem;
+  transition: all 0.2s;
 }
 
 .input-field:focus {
